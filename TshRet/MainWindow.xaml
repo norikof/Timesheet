@@ -1,0 +1,36 @@
+﻿<Window x:Class="TshRet.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		Name="frmMainWindow"
+        Title="Time Sheet Retriever"
+		Height="350" Width="525"
+		IsHitTestVisible="True"
+		WindowStartupLocation="CenterScreen"
+>
+    <StackPanel>
+		<Label Name="lblMessage" Width="501" Height="258" Margin="0,6,0,0" />
+		<WrapPanel>
+			<Button
+				Name="btnDownloadTimesheets"
+				Content="Download Timesheets"
+				Width="144"
+				Height="36"
+				Margin="6,6,0,0" Click="btnDownloadTimesheets_Click"
+			/>
+			<Button
+				Name="btnCreateUploadFile"
+				Content="Create Upload File"
+				Width="144"
+				Height="36"
+				Margin="12,6,0,0" Click="btnCreateUploadFile_Click"
+			/>
+			<Button
+				Name="btnClose"
+				Content="Close"
+				Width="72"
+				Height="36"
+				Margin="124,6,0,0" IsCancel="True" Click="btnClose_Click"
+			/>
+		</WrapPanel>
+    </StackPanel>
+</Window>
