@@ -53,6 +53,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CheckDate.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Timesheet.cs" />
     <Compile Include="TsImportFile.cs" />

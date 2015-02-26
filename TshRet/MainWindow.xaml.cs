@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.IO;
+using System;
 
 namespace TshRet
 {
@@ -31,6 +32,13 @@ namespace TshRet
 		private void CreateTimStarImportFile()
 		{
 			CTsImportFile tsimport = new CTsImportFile();
+            CTimesheet timesheet = new CTimesheet();
+            CCheckDate checkdate = new CCheckDate();
+
+            DateTime dPeriod = checkdate.CheckPeriod();
+            int sPeriodEndDay;
+            if (dPeriod.Day == 1) sPeriodEndDay = 15;
+            else sPeriodEndDay = DateTime.DaysInMonth(dPeriod.Year, dPeriod.Month);
 
 			string sImportXlsx		= @"..\..\..\..\TimeImport.xlsx";
 			string sFieldGlassXls	= @"..\..\..\..\CAC_Time_Sheet_Report.xls";
