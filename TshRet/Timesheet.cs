@@ -11,6 +11,7 @@ namespace TshRet
 		public string sMessage;
 		public string sError;
         public DateTime dPeriod;
+        public string sName;
 
 		public CTimesheet()
 		{
@@ -18,6 +19,7 @@ namespace TshRet
 			sMessage	= string.Empty;
 			sError		= string.Empty;
             dPeriod = DateTime.Today;
+            sName = string.Empty;
 		}
 
 		~CTimesheet()
@@ -107,6 +109,67 @@ namespace TshRet
 
         private bool CreateTimeStarImportXlsx(Excel.Worksheet wshImport, Excel.Worksheet wshTimesheet)
         {
+            //Create data to import to TimeStar
+
+            int iImportRow = wshImport.UsedRange.Rows.Count + 1;
+            int iTimesheetRow = 7;
+            TimeSpan tEndTime = new TimeSpan(0, 0, 0, 0, 0);
+
+            while (wshTimesheet.Cells[iTimesheetRow, 2].Value < dPeriod)    //Skip Anterior if the period is Posterior  
+            {
+                iTimesheetRow++;
+            }
+
+            while (wshTimesheet.Cells[iTimesheetRow, 2].Value != null)        //Repeat until the last line of Timesheet
+            {
+                int iPTO = 0;
+                double dPTOTime = 0;
+
+                if (wshTimesheet.Cells[iTimesheetRow, 11].Value != null) //Check Sick
+                {
+                    iPTO = 1;
+                    dPTOTime = (double)wshTimesheet.Cells[iTimesheetRow, 11].Value;
+                }
+                if (wshTimesheet.Cells[iTimesheetRow, 12].Value != null)    //Check PTO
+                {
+                    iPTO = 2;
+                    dPTOTime = (double)wshTimesheet.Cells[iTimesheetRow, 12].Value;
+                }
+
+                if ((wshTimesheet.Cells[iTimesheetRow, 4].Value == null) && (wshTimesheet.Cells[iTimesheetRow, 7].Value == null) && (dPTOTime == 0))    //Skip blank row
+                {
+                    iTimesheetRow++;
+                    continue;
+                }
+
+                if (iPTO == 0)
+                {
+                    wshImport.Cells[iImportRow, 2] = sName;  //Enter Worker Name
+                    wshImport.Cells[iImportRow, 3] = wshTimesheet.Cells[iTimesheetRow, 2].Value;    //Enter Time Entry Date
+                    wshImport.Cells[iImportRow, 4] = wshTimesheet.Cells[iTimesheetRow, 3].Value;    //Enter Punch In
+                    wshImport.Cells[iImportRow, 5] = "IND";
+                    iImportRow++;
+
+                    wshImport.Cells[iImportRow, 2] = sName;  //Enter Worker Name
+                    wshImport.Cells[iImportRow, 3] = wshTimesheet.Cells[iTimesheetRow, 2].Value;    //Enter Time Entry Date
+                    if (wshTimesheet.Cells[iTimesheetRow, 7].Value != null)
+                        wshImport.Cells[iImportRow, 4] = wshTimesheet.Cells[iTimesheetRow, 7].Value;    //Enter Punch Out
+                    else
+                        wshImport.Cells[iImportRow, 4] = wshTimesheet.Cells[iTimesheetRow, 4].Value;    //Enter Lunch Out
+                    wshImport.Cells[iImportRow, 5] = "OUT";
+                    iImportRow++;
+                }
+                else
+                {
+                    wshImport.Cells[iImportRow, 2] = sName;  //Enter Worker Name
+                    wshImport.Cells[iImportRow, 3] = wshTimesheet.Cells[iTimesheetRow, 2].Value;  //Enter Time Entry Date
+                    wshImport.Cells[iImportRow, 6] = dPTOTime;                      //Enter PTO hours
+                    if (iPTO == 1) wshImport.Cells[iImportRow, 7] = "Sick";
+                    if (iPTO == 2) wshImport.Cells[iImportRow, 7] = "PTO";
+                    iImportRow++;
+                }
+                iTimesheetRow++;
+            }
             return true;
         }
 
