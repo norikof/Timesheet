@@ -190,21 +190,5 @@ namespace TshRet
             if (wshTimesheet.Cells[4, 2].Value == null) return false;
 			return true;
 		}
-
-		private int CountAttendance(int iTotalRow, Excel.Worksheet wshTimesheet)
-		{
-			int		iCount = 0;
-			double	dWorking;
-			double	dHours = 0;
-			for (int i = 7; i < iTotalRow; i++) {
-				if (wshTimesheet.Cells[i, 6].Value is double) {
-					bool bNumeric = double.TryParse(wshTimesheet.Cells[i, 6].Text, out dWorking);
-					if (!bNumeric)						continue;
-					dHours += dWorking;
-					iCount++;
-				}
-			}
-			return iCount;
-		}
 	}
 }
