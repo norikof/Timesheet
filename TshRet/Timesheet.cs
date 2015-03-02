@@ -191,17 +191,6 @@ namespace TshRet
 			return true;
 		}
 
-		private int GetTotalHourRow(Excel.Worksheet wshTimesheet)
-		{
-			int iRow;
-			for (iRow = 7; iRow < 40; iRow++) {
-				if (wshTimesheet.Cells[iRow, 4].Value is string)
-					if (wshTimesheet.Cells[iRow, 4].Value == "Total:")
-						return iRow;
-			}
-			return -1;
-		}
-
 		private int CountAttendance(int iTotalRow, Excel.Worksheet wshTimesheet)
 		{
 			int		iCount = 0;
