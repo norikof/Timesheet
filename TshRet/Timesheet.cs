@@ -11,7 +11,7 @@ namespace TshRet
 		public string sMessage;
 		public string sError;
         public DateTime dPeriod;
-        public string sName;
+        //public string sName;
 
 		public CTimesheet()
 		{
@@ -19,7 +19,7 @@ namespace TshRet
 			sMessage	= string.Empty;
 			sError		= string.Empty;
             dPeriod = DateTime.Today;
-            sName = string.Empty;
+            //sName = string.Empty;
 		}
 
 		~CTimesheet()
@@ -49,6 +49,7 @@ namespace TshRet
 
             //Open timesheet excel file
             FileInfo fiS = new FileInfo(sTimesheetXls); //Get timesheet file info
+            if (fiS.Name.StartsWith("~$")) return false; //Exit if timesheet file is temp file
 
             try
             {
@@ -88,7 +89,8 @@ namespace TshRet
             }
             Excel.Worksheet wshImport = wbkImport.Worksheets[1];    //Open first sheet
 
-			bool bState = CheckContents(wshTimesheet);
+            //bool bState = CheckContents(wshTimesheet);
+            bool bState = CheckTimesheetFormat(wshTimesheet);
             if (bState == true)
             {
                 bState = CreateTimeStarImportXlsx(wshImport, wshTimesheet);
@@ -103,8 +105,8 @@ namespace TshRet
                     wbkImport.Save();   //Overwrite saved import excel file if it already exists
                 else
                     wbkImport.SaveAs(fiV.FullName); //Save as import excel file if not exists
-            }            
-            wbkImport.Close();
+            }
+            wbkImport.Close(false, misValue, misValue);
 
             app.Quit();
             return bState;
@@ -147,13 +149,13 @@ namespace TshRet
 
                 if (iPTO == 0)
                 {
-                    wshImport.Cells[iImportRow, 2] = sName;  //Enter Worker Name
+                    wshImport.Cells[iImportRow, 2] = wshTimesheet.Cells[3, 2].Value;  //Enter Worker Name
                     wshImport.Cells[iImportRow, 3] = wshTimesheet.Cells[iTimesheetRow, 2].Value;    //Enter Time Entry Date
                     wshImport.Cells[iImportRow, 4] = wshTimesheet.Cells[iTimesheetRow, 3].Value;    //Enter Punch In
                     wshImport.Cells[iImportRow, 5] = "IND";
                     iImportRow++;
 
-                    wshImport.Cells[iImportRow, 2] = sName;  //Enter Worker Name
+                    wshImport.Cells[iImportRow, 2] = wshTimesheet.Cells[3, 2].Value;  //Enter Worker Name
                     wshImport.Cells[iImportRow, 3] = wshTimesheet.Cells[iTimesheetRow, 2].Value;    //Enter Time Entry Date
                     if (wshTimesheet.Cells[iTimesheetRow, 7].Value != null)
                         wshImport.Cells[iImportRow, 4] = wshTimesheet.Cells[iTimesheetRow, 7].Value;    //Enter Punch Out
@@ -164,7 +166,7 @@ namespace TshRet
                 }
                 else
                 {
-                    wshImport.Cells[iImportRow, 2] = sName;  //Enter Worker Name
+                    wshImport.Cells[iImportRow, 2] = wshTimesheet.Cells[3, 2].Value;  //Enter Worker Name
                     wshImport.Cells[iImportRow, 3] = wshTimesheet.Cells[iTimesheetRow, 2].Value;  //Enter Time Entry Date
                     wshImport.Cells[iImportRow, 6] = dPTOTime;                      //Enter PTO hours
                     if (iPTO == 1) wshImport.Cells[iImportRow, 7] = "Sick";
@@ -175,33 +177,6 @@ namespace TshRet
             }
             return true;
         }
-
-		public bool CheckContents(Excel.Worksheet wshTimesheet)
-		{
-			if (!CheckTimesheetFormat(wshTimesheet)) {
-				sError = "Invalid timesheet format.";
-				return false;
-			}
-			int iTotalRow	= GetTotalHourRow(wshTimesheet);
-			if (iTotalRow < 0) {
-				sError = "Invalid timesheet format.";
-				return false;
-			}
-
-			string sName	= wshTimesheet.Cells[2, 2].Value;
-			string sPeriod	= GetPeriod(wshTimesheet);
-			int iAttendance	= CountAttendance(iTotalRow, wshTimesheet);
-
-			sMessage += wshTimesheet.Cells[2, 1].Value + " " + sName + "<br />";
-			sMessage += wshTimesheet.Cells[2, 5].Value + " " + wshTimesheet.Cells[2, 6].Value + "<br />";
-			sMessage += wshTimesheet.Cells[4, 1].Value + " " + sPeriod + "<br />";
-			sMessage += "Total days: " + iAttendance.ToString() + "<br />";
-			sMessage += "Total hours: " + wshTimesheet.Cells[iTotalRow, 6].Value + "<br />";
-
-			sFileTitle = sName + " " + sPeriod;
-
-			return true;
-		}
 
 		private bool CheckTimesheetFormat(Excel.Worksheet wshTimesheet)
 		{
