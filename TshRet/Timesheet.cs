@@ -191,15 +191,6 @@ namespace TshRet
 			return true;
 		}
 
-		private string GetPeriod(Excel.Worksheet wshTimesheet)
-		{
-			if (!(wshTimesheet.Cells[4, 2].Value is DateTime)) return string.Empty;
-			DateTime dt = (DateTime)wshTimesheet.Cells[4, 2].Value;
-			string sYear = dt.Year.ToString("0000");
-			string sMonth = dt.Month.ToString("00");
-			return sYear + "-" + sMonth;
-		}
-
 		private int GetTotalHourRow(Excel.Worksheet wshTimesheet)
 		{
 			int iRow;
