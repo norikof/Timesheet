@@ -41,7 +41,7 @@ namespace TshRet
             else sPeriodEndDay = DateTime.DaysInMonth(dPeriod.Year, dPeriod.Month);
 
 			string sImportXlsx		= @"..\..\..\..\TimeImport.xlsx";
-            string sFieldGlassXls = @"..\..\..\..\CAC Time Sheet Combine Report 01Posterior.xls";
+            string sFieldGlassXls = @"..\..\..\..\CAC_Time_Sheet_Combine_Report_02Posterior.xls";
             string sTimesheetFolder = @"\\sv11\Data\06_TimeSheet\TE Timesheet 2015\" + dPeriod.ToString("MM") + sPeriodEndDay;
 
             string[] saTimesheetXls = Directory.GetFiles(sTimesheetFolder, "*.xlsx");

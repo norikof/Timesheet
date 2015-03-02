@@ -96,11 +96,14 @@ namespace TshRet
 
             wbkTimesheet.Close(false, misValue, misValue);  //Close timesheet excel file
 
-            wbkImport.Worksheets[1].Activate();
-            if (File.Exists(fiV.FullName))
-                wbkImport.Save();   //Overwrite saved import excel file if it already exists
-            else
-                wbkImport.SaveAs(fiV.FullName); //Save as import excel file if not exists
+            if (bState == true)
+            {
+                wbkImport.Worksheets[1].Activate();
+                if (File.Exists(fiV.FullName))
+                    wbkImport.Save();   //Overwrite saved import excel file if it already exists
+                else
+                    wbkImport.SaveAs(fiV.FullName); //Save as import excel file if not exists
+            }            
             wbkImport.Close();
 
             app.Quit();
@@ -202,14 +205,14 @@ namespace TshRet
 
 		private bool CheckTimesheetFormat(Excel.Worksheet wshTimesheet)
 		{
-			string sTitle = wshTimesheet.Cells[1, 1].Value;
-			if (wshTimesheet.Cells[1, 1].Value != "TIME SHEET")	return false;
-			if (wshTimesheet.Cells[2, 1].Value != "Name:")		return false;
-			if (wshTimesheet.Cells[2, 2].Value == null)			return false;
-			if (wshTimesheet.Cells[2, 5].Value != "Client:")		return false;
-			if (wshTimesheet.Cells[2, 6].Value == null)			return false;
-			if (wshTimesheet.Cells[4, 1].Value != "Period:")		return false;
-			if (wshTimesheet.Cells[4, 2].Value == null)			return false;
+            string sTitle = wshTimesheet.Cells[1, 1].Value;
+            if (wshTimesheet.Cells[1, 1].Value != "TIME SHEET") return false;
+            if (wshTimesheet.Cells[3, 1].Value != "Name:") return false;
+            if (wshTimesheet.Cells[3, 2].Value == null) return false;
+            if (wshTimesheet.Cells[3, 6].Value != "Client:") return false;
+            if (wshTimesheet.Cells[3, 7].Value == null) return false;
+            if (wshTimesheet.Cells[4, 1].Value != "Period:") return false;
+            if (wshTimesheet.Cells[4, 2].Value == null) return false;
 			return true;
 		}
 
