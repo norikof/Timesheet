@@ -9,27 +9,30 @@ namespace TshRet
 	{
 		public string sFileTitle;
 		public string sMessage;
-		public string sError;
+        public string sError;
+        public string sName;
         public DateTime dPeriod;
-        //public string sName;
+        public int iId;
 
 		public CTimesheet()
 		{
 			sFileTitle	= string.Empty;
 			sMessage	= string.Empty;
-			sError		= string.Empty;
-            dPeriod = DateTime.Today;
-            //sName = string.Empty;
+            sError = string.Empty;
+            sName = string.Empty;
+            dPeriod = DateTime.Today;           
 		}
 
 		~CTimesheet()
 		{
 			sFileTitle	= null;
 			sMessage	= null;
-			sError		= null;
+            sError = null;
+            sName = null;
+            iId = 0;
 		}
 
-        public bool CheckTimesheet(string sImportXlsx, string sTimesheetXls)
+        public bool CheckTimesheet(string sImportXlsx, string sTimesheetXls, string sTEListXls)
 		{
             Excel.Workbook wbkTimesheet;    //timesheet excel file
             Excel.Worksheet wshTimesheet;   //its month's sheet of timesheet
@@ -89,8 +92,14 @@ namespace TshRet
             }
             Excel.Worksheet wshImport = wbkImport.Worksheets[1];    //Open first sheet
 
-            //bool bState = CheckContents(wshTimesheet);
+            //Open TE List excel file
+            FileInfo fiT = new FileInfo(sTEListXls);
+            Excel.Workbook wbkTEList = app.Workbooks.Open(fiT.FullName);
+            Excel.Worksheet wshTEList = wbkTEList.Worksheets["TE"];    //Open first sheet
+
             bool bState = CheckTimesheetFormat(wshTimesheet);
+            iId = CheckEmployeeID(wshTEList);
+
             if (bState == true)
             {
                 bState = CreateTimeStarImportXlsx(wshImport, wshTimesheet);
@@ -149,13 +158,15 @@ namespace TshRet
 
                 if (iPTO == 0)
                 {
-                    wshImport.Cells[iImportRow, 2] = wshTimesheet.Cells[3, 2].Value;  //Enter Worker Name
+                    wshImport.Cells[iImportRow, 1] = iId;  //Enter Worker ID
+                    wshImport.Cells[iImportRow, 2] = sName;  //Enter Worker Name
                     wshImport.Cells[iImportRow, 3] = wshTimesheet.Cells[iTimesheetRow, 2].Value;    //Enter Time Entry Date
                     wshImport.Cells[iImportRow, 4] = wshTimesheet.Cells[iTimesheetRow, 3].Value;    //Enter Punch In
                     wshImport.Cells[iImportRow, 5] = "IND";
                     iImportRow++;
 
-                    wshImport.Cells[iImportRow, 2] = wshTimesheet.Cells[3, 2].Value;  //Enter Worker Name
+                    wshImport.Cells[iImportRow, 1] = iId;  //Enter Worker ID
+                    wshImport.Cells[iImportRow, 2] = sName; //Enter Worker Name
                     wshImport.Cells[iImportRow, 3] = wshTimesheet.Cells[iTimesheetRow, 2].Value;    //Enter Time Entry Date
                     if (wshTimesheet.Cells[iTimesheetRow, 7].Value != null)
                         wshImport.Cells[iImportRow, 4] = wshTimesheet.Cells[iTimesheetRow, 7].Value;    //Enter Punch Out
@@ -166,7 +177,8 @@ namespace TshRet
                 }
                 else
                 {
-                    wshImport.Cells[iImportRow, 2] = wshTimesheet.Cells[3, 2].Value;  //Enter Worker Name
+                    wshImport.Cells[iImportRow, 1] = iId;  //Enter Worker ID
+                    wshImport.Cells[iImportRow, 2] = sName;  //Enter Worker Name
                     wshImport.Cells[iImportRow, 3] = wshTimesheet.Cells[iTimesheetRow, 2].Value;  //Enter Time Entry Date
                     wshImport.Cells[iImportRow, 6] = dPTOTime;                      //Enter PTO hours
                     if (iPTO == 1) wshImport.Cells[iImportRow, 7] = "Sick";
@@ -180,7 +192,6 @@ namespace TshRet
 
 		private bool CheckTimesheetFormat(Excel.Worksheet wshTimesheet)
 		{
-            string sTitle = wshTimesheet.Cells[1, 1].Value;
             if (wshTimesheet.Cells[1, 1].Value != "TIME SHEET") return false;
             if (wshTimesheet.Cells[3, 1].Value != "Name:") return false;
             if (wshTimesheet.Cells[3, 2].Value == null) return false;
@@ -188,7 +199,46 @@ namespace TshRet
             if (wshTimesheet.Cells[3, 7].Value == null) return false;
             if (wshTimesheet.Cells[4, 1].Value != "Period:") return false;
             if (wshTimesheet.Cells[4, 2].Value == null) return false;
+
+            sName = wshTimesheet.Cells[3, 2].Value;
 			return true;
 		}
+
+        private int CheckEmployeeID(Excel.Worksheet wshTEList)
+        {
+            string[] aName = sName.Split(' ');
+            string sSearch = aName[1] + ", " + aName[0];
+
+            Excel.Range currentFind = null;
+            Excel.Range firstFind = null;
+
+            Excel.Range oTEList = wshTEList.get_Range("A1", "C30");
+            // You should specify all these parameters every time you call this method,
+            // since they can be overridden in the user interface. 
+            currentFind = oTEList.Find(sSearch, Type.Missing,
+                Excel.XlFindLookIn.xlValues, Excel.XlLookAt.xlPart,
+                Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlNext, false,
+                Type.Missing, Type.Missing);
+
+            while (currentFind != null)
+            {
+                // Keep track of the first range you find. 
+                if (firstFind == null)
+                {
+                    firstFind = currentFind;
+                }
+
+                // If you didn't move to a new range, you are done.
+                else if (currentFind.get_Address(Excel.XlReferenceStyle.xlA1)
+                      == firstFind.get_Address(Excel.XlReferenceStyle.xlA1))
+                {
+                    int iRow = currentFind.Row;
+                    iId = (int)wshTEList.Cells[iRow, 1].Value;
+                    break;
+                }
+                currentFind = oTEList.FindNext(currentFind);
+            }
+            return iId;
+        }
 	}
 }
