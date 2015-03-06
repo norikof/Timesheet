@@ -138,7 +138,12 @@ namespace TshRet
             {
                 int iPTO = 0;
                 double dPTOTime = 0;
+                double dTotalTime = 0;
+                Excel.Range rng;
 
+                rng = (Excel.Range)wshTimesheet.Cells[iTimesheetRow, 9];
+                if (string.IsNullOrEmpty(rng.Text) == false) dTotalTime = double.Parse(rng.Text);
+                
                 if (wshTimesheet.Cells[iTimesheetRow, 11].Value != null) //Check Sick
                 {
                     iPTO = 1;
@@ -150,14 +155,21 @@ namespace TshRet
                     dPTOTime = (double)wshTimesheet.Cells[iTimesheetRow, 12].Value;
                 }
 
-                if ((wshTimesheet.Cells[iTimesheetRow, 4].Value == null) && (wshTimesheet.Cells[iTimesheetRow, 7].Value == null) && (dPTOTime == 0))    //Skip blank row
+                //if ((wshTimesheet.Cells[iTimesheetRow, 4].Value == null) && (wshTimesheet.Cells[iTimesheetRow, 7].Value == null) && (dPTOTime == 0))    //Skip blank row
+                if(dTotalTime == 0 && iPTO == 0)
                 {
                     iTimesheetRow++;
                     continue;
                 }
 
-                if (iPTO == 0)
+                //if (iPTO == 0)
+                if (dTotalTime != 0)
                 {
+                    DateTime dStartTime = DateTime.FromOADate(wshTimesheet.Cells[iTimesheetRow, 3].Value);
+                    DateTime dEndtime = dStartTime.AddHours(dTotalTime);
+                    tEndTime = dEndtime.TimeOfDay;
+                    //tEndTime = tStartTime.Add(TimeSpan.FromHours(dTotalTime));
+
                     wshImport.Cells[iImportRow, 1] = iId;  //Enter Worker ID
                     wshImport.Cells[iImportRow, 2] = sName;  //Enter Worker Name
                     wshImport.Cells[iImportRow, 3] = wshTimesheet.Cells[iTimesheetRow, 2].Value;    //Enter Time Entry Date
@@ -168,14 +180,15 @@ namespace TshRet
                     wshImport.Cells[iImportRow, 1] = iId;  //Enter Worker ID
                     wshImport.Cells[iImportRow, 2] = sName; //Enter Worker Name
                     wshImport.Cells[iImportRow, 3] = wshTimesheet.Cells[iTimesheetRow, 2].Value;    //Enter Time Entry Date
-                    if (wshTimesheet.Cells[iTimesheetRow, 7].Value != null)
-                        wshImport.Cells[iImportRow, 4] = wshTimesheet.Cells[iTimesheetRow, 7].Value;    //Enter Punch Out
-                    else
-                        wshImport.Cells[iImportRow, 4] = wshTimesheet.Cells[iTimesheetRow, 4].Value;    //Enter Lunch Out
+                    wshImport.Cells[iImportRow, 4] = tEndTime.ToString("hh':'mm"); 
+                    //if (wshTimesheet.Cells[iTimesheetRow, 7].Value != null)
+                    //    wshImport.Cells[iImportRow, 4] = wshTimesheet.Cells[iTimesheetRow, 7].Value;    //Enter Punch Out
+                    //else
+                    //    wshImport.Cells[iImportRow, 4] = wshTimesheet.Cells[iTimesheetRow, 4].Value;    //Enter Lunch Out
                     wshImport.Cells[iImportRow, 5] = "OUT";
                     iImportRow++;
                 }
-                else
+                if(iPTO != 0)
                 {
                     wshImport.Cells[iImportRow, 1] = iId;  //Enter Worker ID
                     wshImport.Cells[iImportRow, 2] = sName;  //Enter Worker Name
