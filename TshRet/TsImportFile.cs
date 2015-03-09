@@ -66,8 +66,27 @@ namespace TshRet
 		private bool CheckFieldglassDataContents(Excel.Worksheet wshFieldglass)
 		{
 			// ここで 内容を Fieldglass からきた file のcheck．
+            if (!CheckFieldglassFileFormat(wshFieldglass))
+            {
+                return false;
+            }
 			return true;
 		}
+
+        private bool CheckFieldglassFileFormat(Excel.Worksheet wshFieldglass)
+        {
+            string sFieldglassTitle = wshFieldglass.Cells[1, 1].Value;
+            if (wshFieldglass.Cells[2, 1].Value != "Worker") return false;
+            if (wshFieldglass.Cells[2, 2].Value != "Time Entry Date") return false;
+            if (wshFieldglass.Cells[2, 3].Value != "Net Billable Hours") return false;
+            if (wshFieldglass.Cells[2, 4].Value != "Net Non-billable Hours") return false;
+            if (wshFieldglass.Cells[2, 5].Value != "Main Document ID") return false;
+            if (wshFieldglass.Cells[2, 6].Value != "Time Sheet ID") return false;
+            if (wshFieldglass.Cells[2, 7].Value != "Worker Comments") return false;
+            if (wshFieldglass.Cells[2, 8].Value != "Time Sheet Comments (Separately)") return false;
+
+            return true;
+        }
 
 		private bool CreateTimeStarImportXlsx(Excel.Worksheet wshImport, Excel.Worksheet wshFieldglass)
 		{

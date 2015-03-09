@@ -165,15 +165,26 @@ namespace TshRet
                 //if (iPTO == 0)
                 if (dTotalTime != 0)
                 {
-                    DateTime dStartTime = DateTime.FromOADate(wshTimesheet.Cells[iTimesheetRow, 3].Value);
+                    DateTime dStartTime;
+                    if(wshTimesheet.Cells[iTimesheetRow, 3].Value != null)
+                        dStartTime = DateTime.FromOADate(wshTimesheet.Cells[iTimesheetRow, 3].Value);
+                    else if(wshTimesheet.Cells[iTimesheetRow, 6].Value != null)
+                        dStartTime = DateTime.FromOADate(wshTimesheet.Cells[iTimesheetRow, 6].Value);
+                    else
+                    {
+                        iTimesheetRow++;
+                        continue;
+                    }
                     DateTime dEndtime = dStartTime.AddHours(dTotalTime);
                     tEndTime = dEndtime.TimeOfDay;
-                    //tEndTime = tStartTime.Add(TimeSpan.FromHours(dTotalTime));
 
                     wshImport.Cells[iImportRow, 1] = iId;  //Enter Worker ID
                     wshImport.Cells[iImportRow, 2] = sName;  //Enter Worker Name
                     wshImport.Cells[iImportRow, 3] = wshTimesheet.Cells[iTimesheetRow, 2].Value;    //Enter Time Entry Date
-                    wshImport.Cells[iImportRow, 4] = wshTimesheet.Cells[iTimesheetRow, 3].Value;    //Enter Punch In
+                    if(wshTimesheet.Cells[iTimesheetRow, 3].Value != null)
+                        wshImport.Cells[iImportRow, 4] = wshTimesheet.Cells[iTimesheetRow, 3].Value;    //Enter Punch In
+                    else if (wshTimesheet.Cells[iTimesheetRow, 6].Value != null)
+                        wshImport.Cells[iImportRow, 4] = wshTimesheet.Cells[iTimesheetRow, 6].Value;    //Enter Punch In
                     wshImport.Cells[iImportRow, 5] = "IND";
                     iImportRow++;
 
@@ -181,10 +192,6 @@ namespace TshRet
                     wshImport.Cells[iImportRow, 2] = sName; //Enter Worker Name
                     wshImport.Cells[iImportRow, 3] = wshTimesheet.Cells[iTimesheetRow, 2].Value;    //Enter Time Entry Date
                     wshImport.Cells[iImportRow, 4] = tEndTime.ToString("hh':'mm"); 
-                    //if (wshTimesheet.Cells[iTimesheetRow, 7].Value != null)
-                    //    wshImport.Cells[iImportRow, 4] = wshTimesheet.Cells[iTimesheetRow, 7].Value;    //Enter Punch Out
-                    //else
-                    //    wshImport.Cells[iImportRow, 4] = wshTimesheet.Cells[iTimesheetRow, 4].Value;    //Enter Lunch Out
                     wshImport.Cells[iImportRow, 5] = "OUT";
                     iImportRow++;
                 }
