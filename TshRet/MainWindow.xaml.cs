@@ -41,14 +41,14 @@ namespace TshRet
             else sPeriodEndDay = DateTime.DaysInMonth(dPeriod.Year, dPeriod.Month);
 
 			string sImportXlsx		= @"..\..\..\..\TimeImport.xlsx";
-            string sFieldGlassXls = @"..\..\..\..\CAC_Time_Sheet_Combine_Report_02Posterior.xls";
+            string sFieldGlassXls = @"..\..\..\..\CAC_Time_Sheet_Combine_Report_01Posterior.xls";
             string sTEListXls = @"\\sv11\Data\06_TimeSheet\TE Timesheet 2015\TE List for Timesheet.xlsx";
             string sTimesheetFolder = @"\\sv11\Data\06_TimeSheet\TE Timesheet 2015\" + dPeriod.ToString("MM") + sPeriodEndDay;
 
             string[] saTimesheetXls = Directory.GetFiles(sTimesheetFolder, "*.xlsx");
             foreach (string sTimesheetXls in saTimesheetXls)
                 timesheet.CheckTimesheet(sImportXlsx, sTimesheetXls, sTEListXls);
-            tsimport.CrateImportFileFromFieldglassData(sImportXlsx, sFieldGlassXls);
+            tsimport.CrateImportFileFromFieldglassData(sImportXlsx, sFieldGlassXls, sTEListXls);
 		}
 	}
 }

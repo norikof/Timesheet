@@ -21,8 +21,8 @@ namespace TshRet
         public DateTime CheckPeriod()
         {
             DateTime dPeriod;
-            DateTime dToday = DateTime.Today;
-            //DateTime dToday = new DateTime(2015, 1, 20);
+            //DateTime dToday = DateTime.Today;
+            DateTime dToday = new DateTime(2015, 2, 10);
 
             if (dToday.Day < 16){
                 if (dToday.Month == 1)      dPeriod = new DateTime(dToday.Year - 1, 12, 16);
