@@ -48,7 +48,7 @@ namespace TshRet
             string[] saTimesheetXls = Directory.GetFiles(sTimesheetFolder, "*.xlsx");
             foreach (string sTimesheetXls in saTimesheetXls)
                 timesheet.CheckTimesheet(sImportXlsx, sTimesheetXls, sTEListXls);
-            tsimport.CrateImportFileFromFieldglassData(sImportXlsx, sFieldGlassXls, sTEListXls);
+            tsimport.CreateImportFileFromFieldglassData(sImportXlsx, sFieldGlassXls, sTEListXls);
 		}
 	}
 }
