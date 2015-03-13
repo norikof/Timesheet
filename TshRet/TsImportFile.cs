@@ -236,7 +236,8 @@ namespace TshRet
                 }
                 else
                 {
-                    wshImport.Cells[iImportRow, 1] = wshFGTimesheet.Cells[iFieldglassRow, 5].Value;  //Enter Main Document ID
+                    //wshImport.Cells[iImportRow, 1] = wshFGTimesheet.Cells[iFieldglassRow, 5].Value;  //Enter Main Document ID
+                    wshImport.Cells[iImportRow, 1] = iId;  //Enter Employee ID
                     wshImport.Cells[iImportRow, 2] = wshFGTimesheet.Cells[iFieldglassRow, 1].Value;  //Enter Worker Name
                     wshImport.Cells[iImportRow, 3] = wshFGTimesheet.Cells[iFieldglassRow, 2].Value;  //Enter Time Entry Date
                     if (dNonbillableTime != 0) wshImport.Cells[iImportRow, 6] = dNonbillableTime;    //Enter Net Non-billable Hours if it's not zero
@@ -247,6 +248,19 @@ namespace TshRet
                 iFieldglassRow++;
 
             }
+
+            int iAbsenceRow = 3;
+            while (wshFGAbsence.Cells[iAbsenceRow, 1].Value != null)        //Repeat until the last line of Absence Report
+            {
+                wshImport.Cells[iImportRow, 1] = CheckEmployeeID(wshTEList, wshFGAbsence.Cells[iAbsenceRow, 3].Value);
+                wshImport.Cells[iImportRow, 2] = wshFGAbsence.Cells[iAbsenceRow, 3].Value;  //Enter Worker Name
+                wshImport.Cells[iImportRow, 3] = wshFGAbsence.Cells[iAbsenceRow, 6].Value;  //Enter Time Entry Date
+                if (wshFGAbsence.Cells[iAbsenceRow, 10].Value != 0) wshImport.Cells[iImportRow, 6] = wshFGAbsence.Cells[iAbsenceRow, 10].Value;    //Enter Partial Absence Hours
+                else wshImport.Cells[iImportRow, 6] = 8; //Enter 8 hours if Partial Absence Hours is zero
+                wshImport.Cells[iImportRow, 7] = "Sick";
+                iImportRow++;
+                iAbsenceRow++;
+            }            
 			return true;
 		}
 
